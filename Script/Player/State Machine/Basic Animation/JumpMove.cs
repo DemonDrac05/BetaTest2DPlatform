@@ -23,31 +23,21 @@ public class JumpMove : PlayerState
     {
         base.FrameUpdate();
 
-        #region Main 
+        #region Main
 
-        if (player.jumpStep >= 1)
+        #region Jump Animation
+
+        if (player.rb2d.velocity.y > .1f && !player.IsGrounded())
         {
-            player.jumpStep--;
-            player.rb2d.velocity = new Vector2(player.rb2d.velocity.x, player.jumpForce);
-
-            #region Jump Animation
-
-            Debug.Log(player.IsGrounded());
-
-            if (player.rb2d.velocity.y > .1f && player.IsGrounded() == false)
-            {
-                if (player.jumpStep == 1)
-                    player.animator.Play("Jump");
-                if (player.jumpStep == 0)
-                    player.animator.Play("Jump");
-            }
-            #endregion
-
-            #region Fall Animation
-            else if (player.rb2d.velocity.y < .1f)
-                player.animator.Play(player.playerFall);
-            #endregion
+            player.animator.Play("Jump");
         }
+        #endregion
+
+        #region Fall Animation
+        else if (player.rb2d.velocity.y < .1f)
+            player.animator.Play(player.playerFall);
+        #endregion
+
         #endregion
 
         #region Jump -> Movement

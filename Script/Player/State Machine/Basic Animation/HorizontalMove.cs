@@ -32,7 +32,7 @@ public class HorizontalMove : PlayerState
             #endregion
 
             #region Idle Animation
-            else if(player.posY == 0)
+            else if(player.posX == 0)
             {
                 player.animator.Play("Idle");
             }
@@ -43,11 +43,13 @@ public class HorizontalMove : PlayerState
         #endregion
 
         #region Movement -> Jump
-        if (Input.GetKeyDown(KeyCode.Space) && player.jumpStep >= 1)
+        if (Input.GetKeyDown(KeyCode.Space) && player.IsGrounded())
         {
-            player.stateMachine.ChangeState(player.jumpState);
+            player.rb2d.velocity = new Vector2(player.rb2d.velocity.x, player.jumpForce);
         }
-            
+
+        if (!player.IsGrounded())
+            player.stateMachine.ChangeState(player.jumpState);
         #endregion
 
         #region Movement -> Attack
