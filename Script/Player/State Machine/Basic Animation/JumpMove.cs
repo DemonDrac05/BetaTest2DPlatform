@@ -26,6 +26,7 @@ public class JumpMove : PlayerState
         #region Main
 
         #region Jump Animation
+
         if (player.rb2d.velocity.y > .1f && !player.IsGrounded())
         {
             player.animator.Play("Jump");

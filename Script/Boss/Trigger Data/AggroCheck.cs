@@ -19,7 +19,7 @@ public class AggroCheck : MonoBehaviour
     {
         if(collision.gameObject == PlayerTarget)
         {
-            boss.SetAggroStatus(true);
+            boss.SetAggroStatus(true);                                      
         }
     }
 

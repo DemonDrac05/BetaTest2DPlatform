@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Unity.VisualScripting;
 
-public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement,PlayerAttack, PlayerStatic
+public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement,PlayerAttack, PlayerStatic, PlayerAttackTrigger
 {
     #region Player Components
     public Rigidbody2D rb2d { get; set; }
@@ -46,31 +47,51 @@ public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement
     public JumpMove jumpState { get; set; }
     public WallHolding wallHoldState { get; set; }
     public NormalAttack attackState { get; set; }
+    public LifeState lifeState { get; set; }
     #endregion
 
     #region Movement (Left & Right)
 
     #region Variables
     [field: SerializeField] public float moveSpeed { get; set; } = 5f;
+    public bool AllowToFlip { get; set; } = true;
     public bool IsFacingRight { get; set; } = true;
-
     public float posX; public float posY; public Vector3 flip;
     #endregion
 
     #region Function
     public void movementInput(out float horizontal,out float vertical)
     {
-        horizontal = Input.GetAxisRaw("Horizontal");
-        vertical = Input.GetAxisRaw("Vertical");
+        #region Block Movement
+        if (!AllowToFlip)
+        {
+            horizontal = 0f;
+            vertical = 0f;
+        }
+        #endregion
+
+        #region Allow Movement
+        else
+        {
+            horizontal = Input.GetAxisRaw("Horizontal");
+            vertical = Input.GetAxisRaw("Vertical");
+        }
+        #endregion
     }
     public void CheckForLeftOrRightFacing()
     {
+        #region Block Flipping
+        if (!AllowToFlip) return;
+        #endregion
+
+        #region Allow Flipping
         IsFacingRight = !IsFacingRight;
 
         flip = transform.localScale; flip.x = -1;
 
         if(flip.x > 0) { transform.Rotate(0, 0, 0); }
         else if(flip.x < 0) { transform.Rotate(0, 180, 0); }
+        #endregion
     }
     #endregion
 
@@ -121,6 +142,22 @@ public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement
     [field: SerializeField] public float attackDuration { get; set; } = 0.5f;
     [field: SerializeField] public float attackCD { get; set; } = 0.6f;
     public float attackCDtime { get; set; }
+
+    #region Trigger Check
+    public bool InRangeAttack { get; set; }
+    public void SetInRangeAttack(bool inRangeAttack)
+    {
+        InRangeAttack = inRangeAttack;
+    }
+    #endregion
+
+    #endregion
+
+    #region Got Damaged Variables
+    public float GotDamagedTime { get; set; }
+    [field: SerializeField] public float GotDamagedDuration { get; set; } = 0.4f;
+    public float DyingTime { get; set; }
+    [field: SerializeField] public float DyingDuration { get; set; } = 2f;
     #endregion
 
     private void Awake()
@@ -131,6 +168,7 @@ public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement
         jumpState = new JumpMove(this, stateMachine);
         wallHoldState = new WallHolding(this, stateMachine);
         attackState = new NormalAttack(this, stateMachine);
+        lifeState = new LifeState(this, stateMachine);
     }
     private void Start()
     {
@@ -158,6 +196,7 @@ public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement
 
         flip.x = 1; jumpStep = 2; isHoldingWall = false;
         attackCDtime = attackCD;
+        GotDamagedTime = GotDamagedDuration;
 
         stateMachine.Initialize(runState);
     }
@@ -168,7 +207,6 @@ public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement
         {
             CheckForLeftOrRightFacing();
         }
-
         else if(posX < 0 && IsFacingRight)
         {
             CheckForLeftOrRightFacing();
@@ -190,48 +228,47 @@ public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement
         #endregion
 
         #region Player Static
-        healthSlider.value = CurrentHealth;
+
+        #region Condition For Player Health
+        if (CurrentHealth < healthSlider.value)
+        {
+            stateMachine.ChangeState(lifeState);
+            healthSlider.value = CurrentHealth;
+        }
+        #endregion
+
+        #region Condition For Player Mana
         manaSlider.value = CurrentMana;
         #endregion
 
-        Debug.Log(IsGrounded());
+        #endregion
 
         stateMachine.CurrentPlayerState.FrameUpdate();
     }
 
     #region Health && Die
 
-    #region Got Damage by Trap
-    
-    #endregion
-
-    #region Got Damage by Enemy
-    #endregion
-    public void Damage()
+    #region Got Damage
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (CurrentHealth <= 0f)
+        #region Got Damage By Enemy
+        if (collision.gameObject.CompareTag("Enemy"))
         {
-            Die();
-
-            RestartLevel();
+            CurrentHealth -= 10f;
         }
-    }
+        #endregion
 
-    public void Die()
-    {
-        rb2d.bodyType = RigidbodyType2D.Static;
-        animator.SetTrigger("death");
+        #region Got Damage by Trap
+        #endregion
     }
+    #endregion
 
-    IEnumerator WaitingLevelRestart()
-    {
-        yield return new WaitForSeconds(10f);
-    }
-
+    #region Restart After Death
     public void RestartLevel()
     {
-        StartCoroutine(WaitingLevelRestart());
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+    #endregion
+
     #endregion
 }

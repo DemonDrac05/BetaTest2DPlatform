@@ -103,6 +103,8 @@ public class Boss : MonoBehaviour, BossComponents, BossMovement, BossTriggerChec
     public BossUltimate ultimateState { get; set; }
     #endregion
 
+    public Player player;
+
     private void Awake()
     {
         stateMachine = new BossStateMachine();
@@ -126,6 +128,8 @@ public class Boss : MonoBehaviour, BossComponents, BossMovement, BossTriggerChec
         healthSlider.maxValue = MaxHealth;
         healthSlider.value = CurrentHealth;
         #endregion
+
+        player = FindObjectOfType<Player>();
 
         stateMachine.Initialize(idleState);
     }

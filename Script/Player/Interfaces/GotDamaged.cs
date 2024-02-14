@@ -5,7 +5,9 @@ using UnityEngine.UI;
 
 public interface GotDamaged
 {
-    void Damage();
-    void Die();
+    float GotDamagedTime { get; set; }
+    float GotDamagedDuration { get; set; }
+    float DyingTime { get; set; }
+    float DyingDuration { get; set; }
     void RestartLevel();
 }

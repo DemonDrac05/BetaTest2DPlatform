@@ -5,6 +5,7 @@ using UnityEngine;
 public interface PlayerMovement
 {
     #region Horizontal Movement
+    bool AllowToFlip { get; set; }
     bool IsFacingRight { get; set; }
     float moveSpeed { get; set; } 
     void movementInput(out float horizontal, out float vertical);
