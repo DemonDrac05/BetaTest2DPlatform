@@ -24,7 +24,7 @@ public class BossIdle : BossState
 
         boss.animator.Play("Idle");
 
-        if(boss.isAggroed)
+        if(boss.isAggroed && boss.player.CurrentHealth > 0f)
         {
             stateMachine.ChangeState(boss.chaseState);
         }

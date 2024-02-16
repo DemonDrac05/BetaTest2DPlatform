@@ -11,7 +11,6 @@ public class WallHolding : PlayerState
     {
         base.EnterState();
     }
-
     public override void ExitState()
     {
         base.ExitState();

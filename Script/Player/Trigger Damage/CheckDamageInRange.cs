@@ -5,6 +5,7 @@ using UnityEngine;
 public class CheckDamageInRange : MonoBehaviour
 {
     public Player player;
+
     public Boss boss;
 
     private void Update()

@@ -24,9 +24,13 @@ public class NormalAttack : PlayerState
         base.FrameUpdate();
 
         #region Attack Animation
-        if(player.IsGrounded())
+        if (player.IsGrounded())
+        {
             player.rb2d.velocity = new Vector2(0, player.rb2d.velocity.y);
+        }
+
         player.attackTime -= Time.deltaTime;
+
         player.animator.Play("Attack");
         #endregion
 
@@ -34,6 +38,7 @@ public class NormalAttack : PlayerState
         if (player.attackTime <= 0f)
         {
             player.attackCDtime = player.attackCD;
+
             player.stateMachine.ChangeState(player.runState);
         }
         #endregion

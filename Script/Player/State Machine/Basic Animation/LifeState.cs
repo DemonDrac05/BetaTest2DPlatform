@@ -6,8 +6,10 @@ using UnityEngine;
 public class LifeState : PlayerState
 {
     public float getFlip = 1f;
+    public Boss boss;
     public LifeState(Player player, PlayerStateMachine stateMachine) : base(player, stateMachine)
     {
+        boss = FindObjectOfType<Boss>();
     }
 
     public override void EnterState()
@@ -18,8 +20,8 @@ public class LifeState : PlayerState
             player.GotDamagedTime = player.GotDamagedDuration;
 
             #region Check Flip Side
-            if (player.IsFacingRight) { getFlip = -1f; }
-            else if (!player.IsFacingRight) { getFlip = 1f; }
+            if (boss.IsFacingRight) { getFlip = 1f; }
+            else if (!boss.IsFacingRight) { getFlip = -1f; }
             #endregion
         }
         else player.DyingTime = player.DyingDuration;
@@ -39,8 +41,9 @@ public class LifeState : PlayerState
         if (player.CurrentHealth > 0f)
         {
             #region Main Function
-            player.rb2d.velocity = new Vector2(player.rb2d.velocity.x +
-                (getFlip * 3), player.rb2d.velocity.y);
+            player.rb2d.velocity 
+                = new Vector2(player.rb2d.velocity.x + (getFlip * 3), player.rb2d.velocity.y);
+
             player.AllowToFlip = false;
             player.GotDamagedTime -= Time.deltaTime;
             player.animator.Play("Hurt");

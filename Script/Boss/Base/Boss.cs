@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
-public class Boss : MonoBehaviour, BossComponents, BossMovement, BossTriggerCheck, Damageable, BossStatic
+public class Boss : MonoBehaviour, BossComponents, BossStatic, BossLife, BossMovement, BossTriggerCheck
 {
     #region Boss Components
     public Rigidbody2D rb2d { get; set; }
@@ -70,22 +71,25 @@ public class Boss : MonoBehaviour, BossComponents, BossMovement, BossTriggerChec
     #region Trigger Check
 
     #region Variables
+    public bool checkInAttackRange { get; set; }
     public bool isAggroed { get; set; }
     public bool isInNormalAttackDistance { get; set; }
     public bool isInUltiAttackDistance { get; set; }
     #endregion
 
     #region Check Function
+    public void SetInAttackRange(bool inAttackRange)
+    {
+        checkInAttackRange = inAttackRange;
+    }
     public void SetAggroStatus(bool Aggroed)
     {
         isAggroed = Aggroed;
     }
-
     public void SetNormalAttackDistance(bool InNormalAttackDistance)
     {
         isInNormalAttackDistance = InNormalAttackDistance;
     }
-
     public void SetUltiAttackDistance(bool InUltiAttackDistance)
     {
         isInUltiAttackDistance = InUltiAttackDistance;
@@ -96,11 +100,24 @@ public class Boss : MonoBehaviour, BossComponents, BossMovement, BossTriggerChec
 
     #region Boss State Machine Variables
     public BossStateMachine stateMachine { get; set; }
+    public BossLifeState lifeState { get; set; }
     public BossIdle idleState { get; set; }
     public BossChase chaseState { get; set; }
     public BossJump jumpState { get; set; }
     public BossAttack attackState { get; set; }
     public BossUltimate ultimateState { get; set; }
+    #endregion
+
+    #region Boss Attack Variables
+    public float attackTimer { get; set; }
+    public float attackDuration { get; set; } = 1f;
+    #endregion
+
+    #region Boss Got Damaged Variables
+    public float GotDamagedTime { get; set; }
+    public float GotDamagedDuration { get; set; } = 0.2f;
+    public float DyingTime { get; set; }
+    public float DyingDuration { get; set; } = 2f;
     #endregion
 
     public Player player;
@@ -109,6 +126,7 @@ public class Boss : MonoBehaviour, BossComponents, BossMovement, BossTriggerChec
     {
         stateMachine = new BossStateMachine();
 
+        lifeState = new BossLifeState(this, stateMachine);
         idleState = new BossIdle(this, stateMachine);
         chaseState = new BossChase(this, stateMachine);
         jumpState = new BossJump(this, stateMachine);
@@ -129,8 +147,6 @@ public class Boss : MonoBehaviour, BossComponents, BossMovement, BossTriggerChec
         healthSlider.value = CurrentHealth;
         #endregion
 
-        player = FindObjectOfType<Player>();
-
         stateMachine.Initialize(idleState);
     }
 
@@ -141,16 +157,27 @@ public class Boss : MonoBehaviour, BossComponents, BossMovement, BossTriggerChec
 
     private void Update()
     {
-        healthSlider.value = CurrentHealth;
+        player = FindObjectOfType<Player>();
+
+        #region Boss Health Static
+        if (CurrentHealth < healthSlider.value)
+        {
+            stateMachine.ChangeState(lifeState);
+            healthSlider.value = CurrentHealth;
+        }
+        #endregion
+
+        #region After Kill -> Idle
+        if (player.CurrentHealth <= 0f)
+        {
+            stateMachine.ChangeState(idleState);
+        }
+        #endregion
 
         stateMachine.CurrentBossState.FrameUpdate();
     }
-
-    public void Damage()
+    public void RestartLevel()
     {
-    }
-
-    public void Die()
-    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

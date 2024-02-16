@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Unity.VisualScripting;
 
-public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement,PlayerAttack, PlayerStatic, PlayerAttackTrigger
+public class Player : MonoBehaviour, PlayerComponents, PlayerStatic, PlayerLife, PlayerMovement, PlayerAttack, PlayerAttackTrigger
 {
     #region Player Components
     public Rigidbody2D rb2d { get; set; }
@@ -43,8 +43,8 @@ public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement
 
     #region State Machine Variables
     public PlayerStateMachine stateMachine { get; set; }
-    public HorizontalMove runState { get; set; }
-    public JumpMove jumpState { get; set; }
+    public HorizontalState runState { get; set; }
+    public JumpState jumpState { get; set; }
     public WallHolding wallHoldState { get; set; }
     public NormalAttack attackState { get; set; }
     public LifeState lifeState { get; set; }
@@ -157,15 +157,16 @@ public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement
     public float GotDamagedTime { get; set; }
     [field: SerializeField] public float GotDamagedDuration { get; set; } = 0.4f;
     public float DyingTime { get; set; }
-    [field: SerializeField] public float DyingDuration { get; set; } = 2f;
+    [field: SerializeField] public float DyingDuration { get; set; } = 1f;
     #endregion
 
+    public Boss boss;
     private void Awake()
     {
         stateMachine = new PlayerStateMachine();
 
-        runState = new HorizontalMove(this, stateMachine);
-        jumpState = new JumpMove(this, stateMachine);
+        runState = new HorizontalState(this, stateMachine);
+        jumpState = new JumpState(this, stateMachine);
         wallHoldState = new WallHolding(this, stateMachine);
         attackState = new NormalAttack(this, stateMachine);
         lifeState = new LifeState(this, stateMachine);
@@ -217,6 +218,8 @@ public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement
     }
     private void Update()
     {
+        boss = FindObjectOfType<Boss>();
+
         #region Player Movement
         movementInput(out posX,out posY);
         rb2d.velocity = new Vector2(posX * moveSpeed, rb2d.velocity.y);
@@ -230,6 +233,10 @@ public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement
         #region Player Static
 
         #region Condition For Player Health
+        if (CurrentHealth <= 0f)
+        {
+            CurrentHealth = 0f;
+        }
         if (CurrentHealth < healthSlider.value)
         {
             stateMachine.ChangeState(lifeState);
@@ -254,7 +261,10 @@ public class Player : MonoBehaviour, GotDamaged, PlayerComponents,PlayerMovement
         #region Got Damage By Enemy
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            CurrentHealth -= 10f;
+            if (CurrentHealth >= 10f && boss.CurrentHealth > 0f)
+            {
+                CurrentHealth -= 10f;
+            } 
         }
         #endregion
 

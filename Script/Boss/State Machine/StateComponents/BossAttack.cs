@@ -5,9 +5,6 @@ using UnityEngine;
 public class BossAttack : BossState
 {
     private Transform playerTransform;
-
-    private float timer;
-    private float duration = 1f;
     public BossAttack(Boss boss, BossStateMachine stateMachine) : base(boss, stateMachine)
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
@@ -15,7 +12,7 @@ public class BossAttack : BossState
 
     public override void EnterState()
     {
-        timer = duration;
+        boss.attackTimer = boss.attackDuration;
         base.EnterState();
     }
 
@@ -28,16 +25,18 @@ public class BossAttack : BossState
     {
         base.FrameUpdate();
 
-        timer -= Time.deltaTime;
-
+        #region Main
+        boss.attackTimer -= Time.deltaTime;
         boss.BossMovement(Vector2.zero);
-
         boss.animator.Play("Attack");
+        #endregion
 
-        if(timer <= 0f)
+        #region Attack -> Chase
+        if (boss.attackTimer <= 0f)
         {
             boss.stateMachine.ChangeState(boss.chaseState);
         }
+        #endregion
     }
 
     public override void PhysicsUpdate()

@@ -5,7 +5,9 @@ using UnityEngine;
 public class BossChase : BossState
 {
     private Transform playerTransform;
+
     private float bossMoveSpeed = 4f;
+
     public BossChase(Boss boss, BossStateMachine stateMachine) : base(boss, stateMachine)
     {
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
@@ -25,17 +27,22 @@ public class BossChase : BossState
     {
         base.FrameUpdate();
 
+        #region Main 
         boss.animator.Play("Run");
 
         Vector2 moveDirection = (playerTransform.position - boss.transform.position).normalized;
+
         moveDirection.y = 0f;
 
         boss.BossMovement(moveDirection * bossMoveSpeed);
+        #endregion
 
-        if(boss.isInNormalAttackDistance)
+        #region Chase -> Attack
+        if (boss.isInNormalAttackDistance)
         {
             boss.stateMachine.ChangeState(boss.attackState);
         }
+        #endregion
     }
 
     public override void PhysicsUpdate()
