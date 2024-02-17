@@ -1,0 +1,16 @@
+UPDATE 17/02/2024
+#Header Features
+- Add Boss Hurt State
+- Add Boss Death State
+- Add Boss Hit Collider
+- Adjust an amount of time for Boss Attack
+
+#Header Bugs (Fixed)
+- Player dying time stop before restarting level
+- Player knockback in wrong side when he's not opposite the boss
+- Boss keeps attacking after Player's death
+- Player cannot go through Boss death body
+
+#Header Development
+- Fix Player knockback when he jumps over Boss and got hit
+- Fix the amount of attacking time from Player
