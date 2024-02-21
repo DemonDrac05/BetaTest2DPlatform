@@ -4,6 +4,8 @@ public class PlayerRespawnStatus : MonoBehaviour
 {
     public Player player;
 
+    public CameraMovement camera;
+
     public SetCheckPoint checkPoint;
 
     private float respawnTime = 0f;
@@ -17,6 +19,8 @@ public class PlayerRespawnStatus : MonoBehaviour
     private void Awake()
     {
         player = FindObjectOfType<Player>();
+
+        camera = FindObjectOfType<CameraMovement>();
 
         checkPoint = FindObjectOfType<SetCheckPoint>();
     }
@@ -70,13 +74,22 @@ public class PlayerRespawnStatus : MonoBehaviour
 
     void Coordination()
     {
+        #region Player
         player.transform.position = new Vector3(
                 checkPoint.playerCheckPoint.x + adjustableWidth,
-                checkPoint.playerCheckPoint.y + adjustableHeight, transform.position.z);
+                checkPoint.playerCheckPoint.y + adjustableHeight, 
+                player.transform.position.z);
+        #endregion
+
+        #region Camera
+        camera.maxPosition.x = checkPoint.playerCheckPoint.x + checkPoint.distanceFromCheckpointToRight;
+        camera.minPosition.x = checkPoint.playerCheckPoint.x -
+          checkPoint.distanceFromCheckpointToLeft;
+        #endregion
     }
 
     void StateMachine()
     {
-        player.stateMachine.ChangeState(player.runState);
+        player.stateMachine.ChangeState(player.jumpState);
     }
 }
