@@ -64,15 +64,13 @@ public class LifeState : PlayerState
         else
         {
             #region Main Function
-            player.AllowToFlip = false;
             player.DyingTime -= Time.deltaTime;
             player.animator.Play("Death");
-            #endregion
 
-            #region Death -> Restart Level
-            if (player.DyingTime <= 0f)
+            if(player.DyingTime <= 0f)
             {
-                player.RestartLevel();
+                player.DyingTime = 0f;
+                player.gameObject.SetActive(false);
             }
             #endregion
         }
@@ -83,4 +81,5 @@ public class LifeState : PlayerState
     {
         base.PhysicsUpdate();
     }
+
 }

@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class HorizontalState : PlayerState
 {
+    public SetCheckPoint checkPoint;
     public HorizontalState(Player player, PlayerStateMachine stateMachine) : base(player, stateMachine)
     {
+        checkPoint = FindObjectOfType<SetCheckPoint>();
     }
 
     public override void EnterState()
@@ -60,6 +62,13 @@ public class HorizontalState : PlayerState
         if (Input.GetKeyDown(KeyCode.K) && player.attackCDtime <= 0f)
         {
             player.stateMachine.ChangeState(player.attackState);
+        }
+        #endregion
+
+        #region Movement -> Checkpoint
+        if (Input.GetKeyDown(KeyCode.E) && checkPoint.atCheckPointReached)
+        {
+            player.stateMachine.ChangeState(player.cpIn);
         }
         #endregion
     }
