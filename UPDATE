@@ -14,3 +14,25 @@ UPDATE 17/02/2024
 #Header Development
 - Fix Player knockback when he jumps over Boss and got hit
 - Fix the amount of attacking time from Player
+
+=====================================================================================================================================================================================================================
+
+UPDATE 21/02/2024
+#Header Features
+- Add Checkpoint Statue
+- Add Checkpoint Saving for Statue
+- Add CameraMovement + Limit of each Room
+- Add RespawnScript for Player after Death
+- Add Checkpoint Animation
+
+#Header Bugs (Fixed)
+- Fix all bugs from 17-02-2024 Note
+- Fix camera stuck after Player Death trigger
+- Fix Portals (using numbers to calculate distance)
+- Fix Player Death without CD reduction
+
+#Header Development
+- Apply to the under border of Map
+- Apply Death when Player falls under the terrain
+
+=====================================================================================================================================================================================================================
