@@ -7,7 +7,14 @@ public class SetCheckPoint : MonoBehaviour
     public GameObject PlayerTarget;
 
     [field: SerializeField] public Transform checkPoint;
+
+    [field: SerializeField] public float distanceFromCheckpointToRight;
+
+    [field: SerializeField] public float distanceFromCheckpointToLeft;
+
     public Vector3 playerCheckPoint;
+
+    public bool atCheckPointReached;
 
     private void Start()
     {
@@ -17,10 +24,15 @@ public class SetCheckPoint : MonoBehaviour
     {
         if(collision.gameObject == PlayerTarget)
         {
-            playerCheckPoint = new Vector3(checkPoint.position.x, 
-                                                    checkPoint.position.y, 
-                                                    transform.position.z);
-            Debug.Log("Hello");
+            playerCheckPoint = new Vector3(checkPoint.position.x, checkPoint.position.y, transform.position.z);
+            atCheckPointReached = true;
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject == PlayerTarget)
+        {
+            atCheckPointReached = false;
         }
     }
 }

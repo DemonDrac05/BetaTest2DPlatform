@@ -5,30 +5,28 @@ using UnityEngine;
 public class RoomTransfer : MonoBehaviour
 {
     [field: SerializeField] public GameObject PlayerTarget;
-    public Vector2 cameraChange;
-    public Vector3 playerChange;
 
-    private CameraMovement camMovement;
+    [field: SerializeField] public float addMinBorder;
 
-    public Camera mainCamera;
+    [field: SerializeField] public float addMaxBorder;
+
+    [field: SerializeField] public Vector3 playerChangePos;
+
+    public CameraMovement cam;
 
     private void Start()
     {
-        mainCamera = FindObjectOfType<Camera>();
-        
-        camMovement = FindObjectOfType<CameraMovement>();
-
         PlayerTarget = GameObject.FindGameObjectWithTag("Player");
-    }
 
+        cam = FindObjectOfType<CameraMovement>();
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject == PlayerTarget)
         {
-            camMovement.maxPosition.x = camMovement.maxPosition.x
-                + 2 * playerChange.x * (Mathf.Pow(mainCamera.orthographicSize,2) - 1);
-            camMovement.minPosition.x = camMovement.maxPosition.x - cameraChange.x;
-            collision.transform.position += playerChange;
+            cam.minPosition.x = cam.maxPosition.x + addMinBorder;
+            cam.maxPosition.x = cam.minPosition.x + addMaxBorder;
+            collision.transform.position += playerChangePos;
         }
     }
 }

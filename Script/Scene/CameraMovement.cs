@@ -8,7 +8,6 @@ public class CameraMovement : MonoBehaviour
 
     public Vector2 maxPosition;
     public Vector2 minPosition;
-
     private void LateUpdate()
     {
         if(transform.position != player.position)
