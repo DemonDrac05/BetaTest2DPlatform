@@ -48,6 +48,13 @@ public class Player : MonoBehaviour, PlayerComponents, PlayerStatic, PlayerLife,
     public WallHolding wallHoldState { get; set; }
     public NormalAttack attackState { get; set; }
     public LifeState lifeState { get; set; }
+
+    #region CheckpointState
+    public CheckpointIn cpIn { get; set; }
+    public CheckpointOut cpOut { get; set; }
+    public CheckpointProgress cpProgress { get; set; }
+    #endregion
+
     #endregion
 
     #region Movement (Left & Right)
@@ -158,6 +165,7 @@ public class Player : MonoBehaviour, PlayerComponents, PlayerStatic, PlayerLife,
     [field: SerializeField] public float GotDamagedDuration { get; set; } = 0.4f;
     public float DyingTime { get; set; }
     [field: SerializeField] public float DyingDuration { get; set; } = 1f;
+    public bool IsDead { get; set; }
     #endregion
 
     public Boss boss;
@@ -165,11 +173,20 @@ public class Player : MonoBehaviour, PlayerComponents, PlayerStatic, PlayerLife,
     {
         stateMachine = new PlayerStateMachine();
 
+        #region State Variables Declaration
         runState = new HorizontalState(this, stateMachine);
         jumpState = new JumpState(this, stateMachine);
         wallHoldState = new WallHolding(this, stateMachine);
         attackState = new NormalAttack(this, stateMachine);
         lifeState = new LifeState(this, stateMachine);
+
+        #region CheckpointState
+        cpIn = new CheckpointIn(this, stateMachine);
+        cpOut = new CheckpointOut(this, stateMachine);
+        cpProgress = new CheckpointProgress(this, stateMachine);
+        #endregion
+
+        #endregion
     }
     private void Start()
     {
@@ -195,9 +212,11 @@ public class Player : MonoBehaviour, PlayerComponents, PlayerStatic, PlayerLife,
         bc2d = GetComponent<BoxCollider2D>();
         #endregion
 
+        #region Player Basic Variables
         flip.x = 1; jumpStep = 2; isHoldingWall = false;
         attackCDtime = attackCD;
         GotDamagedTime = GotDamagedDuration;
+        #endregion
 
         stateMachine.Initialize(runState);
     }
@@ -276,7 +295,6 @@ public class Player : MonoBehaviour, PlayerComponents, PlayerStatic, PlayerLife,
     #region Restart After Death
     public void RestartLevel()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     #endregion
 
